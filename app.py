@@ -4,7 +4,7 @@ from psycopg2.extras import RealDictCursor
 import os
 from dotenv import load_dotenv
 
-load_dotenv()  # <-- this reads your .env file
+
 
 app = Flask(__name__)
 
@@ -37,7 +37,6 @@ def index():
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM users ORDER BY id ASC")
     users = cursor.fetchall()
-    print(users)  # <-- this will print the users to the console for debugging
     conn.close()
     return render_template("index.html", users=users)
 
@@ -58,4 +57,4 @@ def add_user():
     return redirect('/')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False)
