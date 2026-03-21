@@ -1,250 +1,865 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Simple SQLite Website</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>PostgreSQL User Manager · Flask App</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: radial-gradient(circle at 20% 30%, #122c5c, #0a1538 80%, #030617);
+            margin: 0;
+            padding: 32px 20px;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
         }
-        .container {
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+
+        .glass-container {
+            max-width: 900px;
             width: 100%;
-            max-width: 600px;
+            background: rgba(15, 25, 55, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 2rem;
+            padding: 1.8rem;
+            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(120, 170, 255, 0.2);
+            transition: all 0.2s ease;
         }
-        h1, h2 {
-            color: #333;
+
+        /* Header Styles */
+        .app-header {
+            margin-bottom: 1.5rem;
             text-align: center;
         }
-        ul {
-            list-style-type: none;
-            padding: 0;
+
+        h1 {
+            font-size: 1.9rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, #ffffff, #b9d0ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: -0.3px;
+            margin-bottom: 0.25rem;
         }
-        li {
-            background-color: #f9f9f9;
-            margin: 5px 0;
-            padding: 10px;
-            border-radius: 4px;
+
+        .subhead {
+            text-align: center;
+            color: #8fa6e6;
+            font-size: 0.85rem;
+            border-bottom: 1px dashed rgba(100, 150, 255, 0.3);
+            display: inline-block;
+            width: auto;
+            margin-left: auto;
+            margin-right: auto;
+            padding-bottom: 6px;
         }
-        body {
-            font-family: "Inter", Arial, sans-serif;
-            margin: 0;
-            padding: 0;
+
+        /* Developer Cards Section */
+        .dev-section {
+            background: linear-gradient(135deg, rgba(30, 45, 85, 0.6), rgba(20, 35, 70, 0.7));
+            border-radius: 1.2rem;
+            padding: 1rem;
+            margin-bottom: 1.8rem;
+            border: 1px solid rgba(100, 150, 255, 0.3);
+        }
+
+        .dev-title {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #8aa3dd;
+            text-align: center;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        .dev-cards {
             display: flex;
+            gap: 1.2rem;
             justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background: radial-gradient(circle at top left, #1f5cbb 0%, #0f275c 45%, #08132a 100%);
-            color: #e6ecff;
+            flex-wrap: wrap;
         }
-        .container {
-            background: linear-gradient(145deg, rgba(25, 39, 75, 0.95), rgba(11, 20, 54, 0.95));
-            padding: 24px;
-            border-radius: 16px;
-            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
-            width: 100%;
-            max-width: 650px;
-            border: 1px solid rgba(176, 212, 255, 0.32);
-        }
-        h1, h2 {
-            color: #e8f0ff;
+
+        .dev-card {
+            background: linear-gradient(145deg, rgba(45, 70, 120, 0.8), rgba(30, 50, 95, 0.9));
+            border-radius: 1rem;
+            padding: 1rem 1.5rem;
             text-align: center;
-            text-shadow: 0 2px 10px rgba(0,0,0,.25);
+            flex: 1;
+            min-width: 200px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border: 1px solid rgba(100, 150, 255, 0.4);
         }
-        ul {
-            list-style-type: none;
-            padding: 0;
-            margin: 0 0 18px;
+
+        .dev-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            border-color: #6c8fd1;
         }
-        li {
-            background: linear-gradient(130deg, rgba(108, 129, 191, 0.2), rgba(45, 68, 122, 0.35));
-            margin: 8px 0;
-            padding: 14px;
-            border-radius: 10px;
-            border: 1px solid rgba(109, 146, 221, 0.35);
-            line-height: 1.4;
+
+        .dev-role {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #7f9fef;
+            margin-bottom: 0.5rem;
         }
-        .user-label {
-            color: #c5d5ff;
+
+        .dev-name {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 0.3rem;
         }
-        form {
+
+        .dev-github {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 5px 12px;
+            border-radius: 30px;
+            margin-top: 8px;
+            text-decoration: none;
+            color: #b8d0ff;
+            font-size: 0.8rem;
+            font-family: monospace;
+            transition: all 0.2s;
+        }
+
+        .dev-github:hover {
+            background: #2c3e66;
+            color: white;
+            transform: scale(1.02);
+        }
+
+        .dev-github::before {
+            content: "🐙";
+            margin-right: 4px;
+        }
+
+        /* Users Section */
+        .users-section {
+            background: rgba(10, 18, 40, 0.55);
+            border-radius: 1.5rem;
+            padding: 0.2rem 0 0.6rem 0;
+            margin-bottom: 1.8rem;
+            border: 1px solid rgba(74, 124, 205, 0.4);
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 500;
+            padding: 0.8rem 1rem 0rem 1.2rem;
+            color: #e2edff;
             display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        input {
-            padding: 12px;
-            border: 1px solid rgba(171, 192, 244, 0.6);
-            border-radius: 8px;
-            font-size: 16px;
-            background: rgba(255,255,255,.12);
-            color: #fff;
-            backdrop-filter: blur(5px);
-            outline: none;
-        }
-        input:focus {
-            border-color: #8ab3ff;
-            box-shadow: 0 0 10px rgba(138, 179, 255, .25);
-        }
-        .form-actions {
-            display: flex;
+            align-items: center;
             gap: 10px;
             justify-content: space-between;
         }
-        .btn {
-            flex: 1;
-            padding: 12px;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 15px;
-            font-weight: 600;
-            transition: transform 160ms ease, box-shadow 160ms ease, opacity 160ms ease;
+
+        .user-count-badge {
+            font-size: 0.75rem;
+            background: #2a3e6e;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 500;
         }
-        .btn-add {
-            background: linear-gradient(135deg, #32d575, #15a766);
+
+        .user-list {
+            list-style: none;
+            padding: 0.8rem 1rem 1rem 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 400px;
+            overflow-y: auto;
         }
-        .btn-auto {
-            background: linear-gradient(135deg, #7f6aff, #3d50ff);
-        }
-        .btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 8px 18px rgba(43, 54, 110, 0.35);
-            opacity: 0.95;
-        }
-        .stats-panel {
-            margin-top: 20px;
-            display: grid;
-            grid-template-columns: repeat(3, minmax(100px, 1fr));
+
+        .user-card {
+            background: linear-gradient(105deg, rgba(40, 62, 110, 0.6), rgba(26, 42, 80, 0.7));
+            border-radius: 1rem;
+            padding: 14px 18px;
+            border-left: 4px solid #4f9eff;
+            transition: transform 0.1s ease, background 0.2s;
+            backdrop-filter: blur(2px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
             gap: 12px;
         }
-        .stats-panel .stat-card {
-            background: linear-gradient(135deg, #5b86e5, #36d1dc);
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-name {
+            font-weight: 700;
+            color: #e8f0ff;
+            font-size: 1rem;
+            margin-bottom: 4px;
+        }
+
+        .user-email {
+            color: #adc6ff;
+            font-family: monospace;
+            font-size: 0.85rem;
+            word-break: break-all;
+        }
+
+        .user-id {
+            color: #7c93c4;
+            font-size: 0.7rem;
+            font-family: monospace;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+
+        .empty-message {
+            color: #98afdf;
+            text-align: center;
+            padding: 2rem;
+            font-style: italic;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 1rem;
+        }
+
+        /* Form Panel */
+        .form-panel {
+            background: rgba(8, 16, 38, 0.65);
+            border-radius: 1.25rem;
+            padding: 1.2rem 1.2rem 1.5rem;
+            margin: 1rem 0 1.6rem;
+            border: 1px solid rgba(90, 138, 222, 0.5);
+        }
+
+        .form-title {
+            font-size: 1.2rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+            color: #d3e2ff;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .input-field {
+            background: rgba(20, 30, 60, 0.8);
+            border: 1px solid #3a5a9e;
+            border-radius: 14px;
+            padding: 12px 16px;
+            font-size: 0.95rem;
+            color: #f0f5ff;
+            transition: all 0.2s;
+            outline: none;
+            font-weight: 450;
+        }
+
+        .input-field:focus {
+            border-color: #7aaaff;
+            box-shadow: 0 0 0 3px rgba(100, 150, 255, 0.3);
+            background: rgba(30, 45, 85, 0.9);
+        }
+
+        .input-field::placeholder {
+            color: #8fa0cc;
+            font-weight: 400;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 11px 10px;
+            font-weight: 600;
+            border: none;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1);
             color: white;
-            padding: 14px;
-            border-radius: 10px;
-            text-align: center;
-            font-size: 14px;
-            box-shadow: 0 5px 14px rgba(0,0,0,.25);
-            min-height: 70px;
+            letter-spacing: 0.3px;
         }
-        .dummy-sidebar {
-            margin-top: 32px;
-            padding: 16px;
-            border-top: 1px solid rgba(255,255,255,0.12);
-            background: rgba(10, 18, 44, 0.5);
-            border-radius: 11px;
+
+        .btn-primary {
+            background: linear-gradient(110deg, #2c7be5, #1d4ed8);
+            box-shadow: 0 6px 14px rgba(0, 30, 100, 0.3);
         }
-        .dummy-sidebar h3 {
-            margin: 0 0 12px;
-            font-size: 18px;
-            color: #d5e3ff;
-            text-align: center;
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(110deg, #3c8af5, #2b5ce0);
+            box-shadow: 0 10px 20px rgba(0, 20, 80, 0.4);
         }
-        .stats-panel {
-            margin-top: 20px;
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            transform: none;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(110deg, #6c63ff, #4a3aff);
+            box-shadow: 0 5px 12px rgba(80, 60, 200, 0.3);
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.05);
+        }
+
+        /* Dummy Widget */
+        .dummy-widget {
+            background: rgba(0, 0, 0, 0.35);
+            border-radius: 1.2rem;
+            padding: 1rem;
+            margin-top: 1.2rem;
+            border: 1px solid rgba(130, 170, 240, 0.4);
+        }
+
+        .dummy-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        .dummy-header h3 {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #bdd4ff;
+            letter-spacing: -0.2px;
+        }
+
+        .refresh-dummy {
+            background: rgba(200, 220, 255, 0.15);
+            border: none;
+            color: #c6dcff;
+            border-radius: 30px;
+            padding: 5px 12px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: 0.1s;
+            font-weight: 500;
+        }
+
+        .refresh-dummy:hover {
+            background: #3f60aa;
+            color: white;
+        }
+
+        .stats-grid {
             display: grid;
-            gap: 10px;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
         }
-        .stats-panel .stat-card {
-            background: linear-gradient(135deg, #5b86e5, #36d1dc);
-            color: white;
+
+        .dummy-card {
+            background: linear-gradient(145deg, #283c6e, #1b2b55);
+            border-radius: 14px;
             padding: 12px;
-            border-radius: 8px;
             text-align: center;
-            font-size: 16px;
-            box-shadow: 0 4px 10px rgba(0,0,0,.1);
+            transition: all 0.2s;
+            border: 1px solid #4f74bd;
+            cursor: pointer;
         }
-        .dummy-sidebar {
-            margin-top: 30px;
-            padding: 15px;
-            border-top: 1px solid #e4e4e4;
-            background: #fafafa;
-            border-radius: 8px;
+
+        .dummy-card:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(145deg, #324a82, #223664);
         }
-        .dummy-sidebar h3 {
-            margin: 0 0 12px;
-            font-size: 18px;
-            color: #333;
+
+        .dummy-name {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #ffffff;
+        }
+
+        .dummy-mail {
+            font-size: 0.7rem;
+            font-family: monospace;
+            color: #bdd4ff;
+            margin-top: 6px;
+            word-break: break-all;
+        }
+
+        /* Footer Styles */
+        .app-footer {
+            margin-top: 1.8rem;
+            padding-top: 1.2rem;
+            border-top: 1px solid rgba(100, 150, 255, 0.25);
             text-align: center;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            font-size: 0.75rem;
+            color: #7c93c4;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .footer-link {
+            color: #9ab3e6;
+            text-decoration: none;
+            transition: color 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .footer-link:hover {
+            color: #c9deff;
+            text-decoration: underline;
+        }
+
+        .tech-stack {
+            font-family: monospace;
+            font-size: 0.7rem;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        .toast-notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #2e7d64;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .toast-error {
+            background: #c44536;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: 16px 12px;
+            }
+            .glass-container {
+                padding: 1rem;
+            }
+            .btn-group {
+                flex-direction: column;
+            }
+            .user-card {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            h1 {
+                font-size: 1.6rem;
+            }
+            .dev-cards {
+                flex-direction: column;
+            }
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+
+        .user-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .user-list::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+        }
+
+        .user-list::-webkit-scrollbar-thumb {
+            background: #4f74bd;
+            border-radius: 10px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Users</h1>
-        <ul>
-            {% for user in users %}
-                <li>
-                    <strong>Name:</strong> {{ user.name }}<br>
-                    <strong>Email:</strong> {{ user.email }}
-                </li>
-            {% endfor %}
-        </ul>
 
-        <h2>Add User</h2>
-        <form method="POST" action="/add" autocomplete="on" id="add-user-form">
-            <input type="text" name="name" id="name" placeholder="Name" autocomplete="name" required>
-            <input type="email" name="email" id="email" placeholder="Email" autocomplete="email" required>
-            <div class="form-actions">
-                <button type="button" class="btn btn-auto" id="autofill-btn">Autofill</button>
-                <button type="submit" class="btn btn-add">Add</button>
-            </div>
-        </form>
-
-        <div class="dummy-sidebar">
-            <h3>Random Dummy Data</h3>
-            <div class="stats-panel" id="dummy-stats"></div>
+<div class="glass-container">
+    <!-- HEADER SECTION -->
+    <div class="app-header">
+        <h1>🐘 PostgreSQL User Manager</h1>
+        <div style="text-align: center; margin-top: 8px;">
+            <span class="subhead">⚡ Flask + PostgreSQL · Persistent Storage</span>
         </div>
     </div>
 
-    <script>
-        const dummyNames = [
-            'Ava Stewart', 'Mason Clarke', 'Isla Brown', 'Kai Harper', 'Chloe Reed',
-            'Leo Bennett', 'Mia Parker', 'Noah Fisher', 'Zara Hayes', 'Owen Grant'
-        ];
+    <!-- DEVELOPER SECTION (Senior & Junior) -->
+    <div class="dev-section">
+        <div class="dev-title">👨‍💻 Development Team</div>
+        <div class="dev-cards">
+            <!-- Senior Developer: Maaz Waheed -->
+            <div class="dev-card">
+                <div class="dev-role">⭐ Senior Developer</div>
+                <div class="dev-name">Maaz Waheed</div>
+                <a href="https://github.com/42Wor" target="_blank" class="dev-github">
+                    42Wor
+                </a>
+            </div>
+            <!-- Junior Developer: Ghulam Ahmad -->
+            <div class="dev-card">
+                <div class="dev-role">🚀 Junior Developer</div>
+                <div class="dev-name">Ghulam Ahmad</div>
+                <a href="https://github.com/Myth0" target="_blank" class="dev-github">
+                    Myth0
+                </a>
+            </div>
+        </div>
+    </div>
 
-        const dummyDomains = ['example.com', 'mail.com', 'demo.org', 'test.net'];
+    <!-- USERS LIST SECTION -->
+    <div class="users-section">
+        <div class="section-title">
+            <span>👥 Registered Users</span>
+            <span class="user-count-badge" id="user-count-badge">0</span>
+        </div>
+        <ul class="user-list" id="user-list-container">
+            {% for user in users %}
+            <li class="user-card">
+                <div class="user-info">
+                    <div class="user-name">{{ user.name }}</div>
+                    <div class="user-email">📧 {{ user.email }}</div>
+                </div>
+                <div class="user-id">#{{ user.id }}</div>
+            </li>
+            {% else %}
+            <li class="empty-message">✨ No users yet. Add someone above!</li>
+            {% endfor %}
+        </ul>
+    </div>
 
-        function randomItem(arr) {
-            return arr[Math.floor(Math.random() * arr.length)];
+    <!-- ADD USER FORM -->
+    <div class="form-panel">
+        <div class="form-title">
+            <span>📝 Add New User</span>
+        </div>
+        <form id="user-form" method="POST" action="/add">
+            <div class="input-group">
+                <input type="text" name="name" id="name-input" class="input-field" placeholder="Full name" autocomplete="name" required>
+                <input type="email" name="email" id="email-input" class="input-field" placeholder="Email address" autocomplete="email" required>
+            </div>
+            <div class="btn-group">
+                <button type="button" id="autofill-btn" class="btn btn-secondary">✨ Autofill</button>
+                <button type="submit" id="submit-btn" class="btn btn-primary">➕ Add User</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- DUMMY WIDGET -->
+    <div class="dummy-widget">
+        <div class="dummy-header">
+            <h3>🎲 Random Suggestions · Click to autofill</h3>
+            <button id="refresh-dummy-btn" class="refresh-dummy">⟳ Shuffle</button>
+        </div>
+        <div id="dummy-stats-grid" class="stats-grid"></div>
+        <p style="font-size: 0.7rem; text-align: right; margin-top: 10px; opacity: 0.7;">💡 Click any profile to fill the form instantly</p>
+    </div>
+
+    <!-- FOOTER SECTION -->
+    <div class="app-footer">
+        <div class="footer-content">
+            <div class="tech-stack">
+                🐘 PostgreSQL · 🐍 Flask · 🎨 Modern UI
+            </div>
+            <div class="footer-links">
+                <a href="https://github.com/42Wor" target="_blank" class="footer-link">
+                    📦 Senior Dev: 42Wor
+                </a>
+                <a href="https://github.com/Myth0" target="_blank" class="footer-link">
+                    🔧 Junior Dev: Myth0
+                </a>
+            </div>
+            <div style="font-size: 0.7rem;">
+                © 2025 User Management System | MIT License
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Dummy data pools for suggestions
+    const dummyNamesPool = [
+        'Ava Stewart', 'Mason Clarke', 'Isla Brown', 'Kai Harper', 'Chloe Reed',
+        'Leo Bennett', 'Mia Parker', 'Noah Fisher', 'Zara Hayes', 'Owen Grant',
+        'Luna Chen', 'Elias Voss', 'Nina Kowalski', 'Rafael Silva', 'Sophia Wright',
+        'Jameson Cole', 'Amara Okafor', 'Theo Lambert', 'Clara Dubois', 'Felix Novak',
+        'Emma Watson', 'Liam O\'Connor', 'Olivia Chen', 'Ethan Zhang', 'Sophia Rodriguez'
+    ];
+    
+    const dummyDomains = ['example.com', 'mailbox.org', 'webcode.dev', 'postgresql.demo', 'userbase.net', 'contact.me', 'flaskapp.com'];
+
+    // Helper: generate email from name
+    function generateEmailFromName(fullName, domain) {
+        let clean = fullName.toLowerCase().replace(/[^a-z0-9]/g, '.');
+        let parts = clean.split('.');
+        let emailName = parts.filter(p => p && p.length > 0).slice(0, 2).join('.');
+        if (!emailName || emailName.length < 3) emailName = fullName.split(' ')[0].toLowerCase();
+        return `${emailName}@${domain}`;
+    }
+
+    // Generate random user object
+    function generateRandomUser() {
+        const name = dummyNamesPool[Math.floor(Math.random() * dummyNamesPool.length)];
+        const domain = dummyDomains[Math.floor(Math.random() * dummyDomains.length)];
+        const email = generateEmailFromName(name, domain);
+        return { name, email };
+    }
+
+    // Generate dummy profiles for widget
+    function generateDummyProfiles(count = 3) {
+        const profiles = [];
+        for (let i = 0; i < count; i++) {
+            profiles.push(generateRandomUser());
         }
+        return profiles;
+    }
 
-        function renderDummyStats() {
-            const container = document.getElementById('dummy-stats');
-            container.innerHTML = '';
-            for (let i = 1; i <= 3; i++) {
-                const name = randomItem(dummyNames);
-                const email = `${name.split(' ')[0].toLowerCase()}.${name.split(' ')[1].toLowerCase()}@${randomItem(dummyDomains)}`;
-                const card = document.createElement('div');
-                card.className = 'stat-card';
-                card.innerHTML = `<strong>${name}</strong><br>${email}`;
-                container.appendChild(card);
+    // Show temporary notification
+    function showToast(message, isError = false) {
+        const toast = document.createElement('div');
+        toast.className = `toast-notification ${isError ? 'toast-error' : ''}`;
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+
+    // Escape HTML
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    // Render dummy widget
+    function renderDummyWidget() {
+        const container = document.getElementById('dummy-stats-grid');
+        if (!container) return;
+        const profiles = generateDummyProfiles(3);
+        container.innerHTML = '';
+        profiles.forEach(profile => {
+            const card = document.createElement('div');
+            card.className = 'dummy-card';
+            card.innerHTML = `
+                <div class="dummy-name">${escapeHtml(profile.name)}</div>
+                <div class="dummy-mail">${escapeHtml(profile.email)}</div>
+            `;
+            card.addEventListener('click', () => {
+                document.getElementById('name-input').value = profile.name;
+                document.getElementById('email-input').value = profile.email;
+                showToast('📋 Profile copied to form!', false);
+                const nameInput = document.getElementById('name-input');
+                nameInput.style.transform = 'scale(1.01)';
+                setTimeout(() => { nameInput.style.transform = ''; }, 200);
+            });
+            container.appendChild(card);
+        });
+    }
+
+    // Update user count badge
+    function updateUserCount() {
+        const userList = document.getElementById('user-list-container');
+        if (!userList) return;
+        const items = userList.querySelectorAll('.user-card');
+        const count = items.length;
+        const badge = document.getElementById('user-count-badge');
+        if (badge) badge.innerText = count;
+        
+        if (count === 0 && userList.querySelector('.empty-message') === null) {
+            const emptyLi = document.createElement('li');
+            emptyLi.className = 'empty-message';
+            emptyLi.innerText = '✨ No users yet. Add someone above!';
+            userList.innerHTML = '';
+            userList.appendChild(emptyLi);
+        } else if (count > 0 && userList.querySelector('.empty-message')) {
+            const emptyMsg = userList.querySelector('.empty-message');
+            if (emptyMsg) emptyMsg.remove();
+        }
+    }
+
+    // Handle form submission with AJAX
+    async function addUser(name, email) {
+        if (!name.trim() || !email.trim()) {
+            showToast('❌ Name and email are required', true);
+            return false;
+        }
+        
+        if (!email.includes('@') || !email.includes('.')) {
+            showToast('⚠️ Please enter a valid email address', true);
+            return false;
+        }
+        
+        try {
+            const formData = new URLSearchParams();
+            formData.append('name', name.trim());
+            formData.append('email', email.trim());
+            
+            const response = await fetch('/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: formData.toString()
+            });
+            
+            if (response.redirected || response.ok) {
+                window.location.href = '/';
+                return true;
+            } else {
+                showToast(`⚠️ Could not add user (${response.status})`, true);
+                return false;
             }
+        } catch (err) {
+            console.error("Network error", err);
+            showToast('🚨 Connection error. Make sure Flask server is running.', true);
+            return false;
         }
+    }
 
-        function fillAutofillForm() {
-            const targetName = document.getElementById('name');
-            const targetEmail = document.getElementById('email');
-            const name = randomItem(dummyNames);
-            const email = `${name.split(' ')[0].toLowerCase()}.${name.split(' ')[1].toLowerCase()}@${randomItem(dummyDomains)}`;
-            targetName.value = name;
-            targetEmail.value = email;
+    // Auto-fill form with random data
+    function autofillForm() {
+        const randomUser = generateRandomUser();
+        const nameInput = document.getElementById('name-input');
+        const emailInput = document.getElementById('email-input');
+        if (nameInput && emailInput) {
+            nameInput.value = randomUser.name;
+            emailInput.value = randomUser.email;
+            showToast('🎲 Form filled with random suggestion!', false);
+            nameInput.style.transform = 'scale(1.02)';
+            emailInput.style.transform = 'scale(1.02)';
+            setTimeout(() => {
+                nameInput.style.transform = '';
+                emailInput.style.transform = '';
+            }, 200);
         }
+    }
 
-        document.getElementById('autofill-btn').addEventListener('click', fillAutofillForm);
+    // Setup form handler
+    function setupFormHandler() {
+        const form = document.getElementById('user-form');
+        if (!form) return;
+        
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('name-input').value;
+            const email = document.getElementById('email-input').value;
+            const submitBtn = document.getElementById('submit-btn');
+            const originalText = submitBtn.innerText;
+            
+            submitBtn.innerText = '⏳ Adding...';
+            submitBtn.disabled = true;
+            
+            const success = await addUser(name, email);
+            
+            if (!success) {
+                submitBtn.innerText = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+    }
 
-        renderDummyStats();
-    </script>
+    function setupDummyHandlers() {
+        const refreshBtn = document.getElementById('refresh-dummy-btn');
+        if (refreshBtn) {
+            refreshBtn.addEventListener('click', () => {
+                renderDummyWidget();
+                showToast('🔄 Suggestions refreshed!', false);
+            });
+        }
+    }
+
+    function setupAutofillHandler() {
+        const autofillBtn = document.getElementById('autofill-btn');
+        if (autofillBtn) {
+            autofillBtn.addEventListener('click', autofillForm);
+        }
+    }
+
+    function init() {
+        setupFormHandler();
+        setupAutofillHandler();
+        setupDummyHandlers();
+        renderDummyWidget();
+        updateUserCount();
+        
+        const emailInput = document.getElementById('email-input');
+        if (emailInput) {
+            emailInput.addEventListener('blur', function() {
+                const email = this.value;
+                if (email && !email.includes('@')) {
+                    this.style.borderColor = '#c44536';
+                } else {
+                    this.style.borderColor = '#3a5a9e';
+                }
+            });
+            emailInput.addEventListener('focus', function() {
+                this.style.borderColor = '#7aaaff';
+            });
+        }
+    }
+    
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+</script>
 </body>
 </html>
