@@ -35,7 +35,7 @@ init_db()
 def index():
     conn = get_conn()
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM users ORDER BY id ASC")
+    cursor.execute("SELECT * FROM users ORDER BY id DESC LIMIT 100")
     users = cursor.fetchall()
     conn.close()
     return render_template("index.html", users=users)
