@@ -4,7 +4,7 @@ from psycopg2.extras import RealDictCursor
 import os
 from dotenv import load_dotenv
 
-
+#load_dotenv()  # <-- this reads your .env file
 
 app = Flask(__name__)
 
